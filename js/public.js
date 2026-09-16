@@ -64,7 +64,7 @@
 
     // Menú de pizzas
     $('#menu-grid').innerHTML = (data.pizzas || []).map(p => `
-      <article class="pizza${p.disponible ? '' : ' no-disp'}">
+      <article class="pizza${p.disponible ? ' pizza-clickable' : ' no-disp'}"${p.disponible ? ` data-add="${p.id}"` : ''}>
         <div class="pizza-foto">
           ${badgeHtml(p.badge)}
           ${p.disponible ? '' : '<span class="badge-off">Agotada por hoy</span>'}
@@ -77,6 +77,9 @@
             <div class="precio"><span>Mediana</span><strong>${precio(p.mediana)}</strong></div>
             <div class="precio"><span>Familiar</span><strong>${precio(p.familiar)}</strong></div>
           </div>
+          ${p.disponible
+            ? `<button class="btn btn-rojo pizza-add" type="button" data-add="${p.id}">＋ Agregar al pedido</button>`
+            : `<button class="btn btn-fantasma pizza-add" type="button" disabled>Agotada por hoy</button>`}
         </div>
       </article>`).join('');
 
@@ -90,6 +93,7 @@
           <span class="ico">${icon('bebida')}</span>
           <b>${data.bebida.nombre}</b>
           <span>${precio(data.bebida.precio)}</span>
+          <button class="chip-add" type="button" data-add-drink="1" aria-label="Agregar bebida al pedido">＋</button>
         </div>`;
     } else { $('#bebida-row').innerHTML = ''; }
 
@@ -143,6 +147,10 @@
       const svg = s.querySelector('svg');
       if (svg) { svg.style.width = '1.15em'; svg.style.height = '1.15em'; }
     });
+
+    // Avisar al carrito (cart.js) que hay menú vigente para leer precios/nombres
+    window.LV._data = d;
+    document.dispatchEvent(new CustomEvent('lv:menu', { detail: d }));
   }
 
   // Primer render inmediato (caché / semilla)

@@ -48,6 +48,10 @@
       }
     ],
     adicionales: [
+      // El borde relleno es el sello de la casa: se trata como adicional para poder
+      // ponerle precio desde el panel. Regla especial: solo 1 vez por pizza (unico)
+      // y no aplica a la Tequepizza (ya lo trae de fábrica).
+      { id: 'borde-relleno', nombre: 'Borde relleno de queso', ico: 'queso', mediana: 2, familiar: 3, unico: true, sello: true },
       { id: 'mozzarella', nombre: 'Queso mozzarella', ico: 'queso', mediana: 1.5, familiar: 2.5 },
       { id: 'pimenton-cebolla', nombre: 'Pimentón o cebolla', ico: 'pimenton', mediana: 1, familiar: 1.5 },
       { id: 'maiz', nombre: 'Maíz', ico: 'maiz', mediana: 1.5, familiar: 2.5 },

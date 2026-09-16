@@ -385,6 +385,216 @@ html { accent-color: var(--rojo); }
 .nav-movil-panel .cerrar svg { width: 24px; height: 24px; stroke: var(--rojo); }
 
 /* ============================================================
+   PEDIDO / CARRITO (cart.js)
+   ============================================================ */
+
+/* CRÍTICO: cualquier elemento del carrito con [hidden] NO debe mostrarse
+   ni capturar toques. (Reglas como display:grid anulan el hidden por defecto.) */
+#lv-cart-root [hidden] { display: none !important; }
+
+/* Botón Agregar en tarjeta de pizza */
+.pizza-clickable { cursor: pointer; }
+.pizza-clickable .pizza-foto::after {
+  content: ""; position: absolute; inset: 0; background: rgba(167,28,25,0);
+  transition: background .2s; pointer-events: none;
+}
+.pizza-clickable:hover .pizza-foto::after { background: rgba(167,28,25,.06); }
+.pizza-add { width: 100%; justify-content: center; margin-top: 1rem; font-size: .95rem; padding: .75em 1.2em; pointer-events: none; }
+.pizza-add[disabled] { cursor: not-allowed; opacity: .6; }
+
+/* Botón + en la bebida */
+.chip-bebida { padding-right: .5rem; }
+.chip-add {
+  width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%;
+  background: var(--rojo); color: var(--crema-clara);
+  font-size: 1.2rem; font-weight: 700; line-height: 0;
+  display: grid; place-items: center; transition: transform .12s, background .15s;
+}
+.chip-add:hover { background: var(--rojo-osc); transform: scale(1.08); }
+
+/* ---------- FAB (esquina superior derecha) ---------- */
+.lv-fab {
+  position: fixed; top: 82px; right: 16px; z-index: 55;
+  display: inline-flex; align-items: center; gap: .6rem;
+  background: var(--rojo); color: var(--crema-clara);
+  border-radius: 999px; padding: .6rem .95rem .6rem .7rem;
+  box-shadow: var(--sombra-md);
+  border: 2.5px solid var(--crema-clara);
+  transition: transform .18s var(--ease-salida), box-shadow .18s, background .15s;
+  max-width: calc(100vw - 32px);
+}
+.lv-fab:hover { background: var(--rojo-osc); transform: translateY(-2px); box-shadow: var(--sombra-lg); }
+.lv-fab-ico { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; }
+.lv-fab-ico svg { width: 24px; height: 24px; stroke: var(--queso-claro); }
+.lv-fab-main { display: flex; flex-direction: column; line-height: 1.05; text-align: left; min-width: 0; }
+.lv-fab-label { font-family: var(--f-titular); font-weight: 800; font-size: .92rem; white-space: nowrap; }
+.lv-fab-sub { font-size: .72rem; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-fab-count {
+  flex: 0 0 auto; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+  background: var(--queso); color: var(--texto);
+  font-family: var(--f-titular); font-weight: 800; font-size: .82rem;
+  display: grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.lv-fab.empty { background: var(--rojo); }
+.lv-fab.empty .lv-fab-ico svg { stroke: var(--crema-clara); }
+.lv-fab.bump { animation: lvBump .4s var(--ease-salida); }
+@keyframes lvBump { 0% { transform: scale(1); } 35% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+/* ---------- Scrim ---------- */
+.lv-scrim { position: fixed; inset: 0; z-index: 100; background: rgba(41,35,31,.5); backdrop-filter: blur(3px); opacity: 0; transition: opacity .25s; }
+.lv-scrim.show { opacity: 1; }
+
+/* ---------- Drawer (panel del pedido) ---------- */
+.lv-drawer {
+  position: fixed; top: 0; right: 0; z-index: 110;
+  width: min(430px, 100%); height: 100%;
+  background: var(--crema); box-shadow: var(--sombra-lg);
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .3s var(--ease-salida);
+}
+.lv-drawer.open { transform: translateX(0); }
+.lv-drawer-head {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.2rem; background: var(--rojo); color: var(--crema-clara);
+}
+.lv-drawer-head h3 { font-family: var(--f-titular); font-weight: 800; font-size: 1.35rem; }
+.lv-x { color: currentColor; padding: 6px; line-height: 0; border-radius: 10px; transition: background .15s; }
+.lv-x svg { width: 24px; height: 24px; stroke: currentColor; }
+.lv-drawer-head .lv-x:hover { background: rgba(255,255,255,.15); }
+.lv-drawer-body { flex: 1 1 auto; overflow-y: auto; padding: 1.1rem 1.2rem; }
+.lv-drawer-foot { flex: 0 0 auto; padding: 1rem 1.2rem 1.2rem; border-top: 1px solid rgba(41,35,31,.1); background: var(--crema-card); }
+
+/* Líneas del pedido */
+.lv-lines { display: flex; flex-direction: column; gap: .8rem; }
+.lv-line { background: var(--blanco); border: 1px solid rgba(41,35,31,.08); border-radius: var(--radio); padding: .85rem .95rem; box-shadow: var(--sombra-sm); }
+.lv-line-top { display: flex; justify-content: space-between; gap: .8rem; align-items: flex-start; }
+.lv-line-nom { font-family: var(--f-titular); font-weight: 800; font-size: 1.08rem; display: block; }
+.lv-line-size { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-suave); margin-top: 2px; }
+.lv-line-extras { margin: .45rem 0 0; padding-left: .1rem; display: flex; flex-direction: column; gap: .15rem; }
+.lv-line-extras li { font-size: .86rem; color: var(--texto-suave); padding-left: .9rem; position: relative; }
+.lv-line-extras li::before { content: "•"; position: absolute; left: 0; color: var(--rojo); }
+.lv-line-price { font-family: var(--f-titular); font-weight: 800; color: var(--rojo); font-size: 1.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lv-line-actions { display: flex; align-items: center; gap: .3rem; margin-top: .7rem; }
+.lv-link { font-family: var(--f-titular); font-weight: 700; font-size: .84rem; color: var(--rojo); padding: .3rem .5rem; border-radius: 8px; transition: background .15s; }
+.lv-link:hover { background: rgba(167,28,25,.08); }
+.lv-link.danger { color: var(--texto-suave); margin-left: auto; }
+.lv-link.danger:hover { color: var(--rojo); background: rgba(167,28,25,.08); }
+
+/* Bebida en el panel */
+.lv-drink { display: flex; align-items: center; gap: .7rem; margin-top: .8rem; background: var(--blanco); border: 1px solid rgba(41,35,31,.08); border-radius: var(--radio); padding: .7rem .95rem; box-shadow: var(--sombra-sm); }
+.lv-drink-ico { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; }
+.lv-drink-ico svg { width: 20px; height: 20px; stroke: var(--rojo); }
+.lv-drink-txt { flex: 1; line-height: 1.15; }
+.lv-drink-txt b { font-family: var(--f-titular); }
+.lv-drink-txt small { display: block; color: var(--texto-suave); font-size: .8rem; }
+
+.lv-addmore { width: 100%; margin-top: 1rem; padding: .8rem; border: 2px dashed rgba(167,28,25,.35); border-radius: var(--radio); background: transparent; color: var(--rojo); font-family: var(--f-titular); font-weight: 700; transition: background .15s, border-color .15s; }
+.lv-addmore:hover { background: rgba(167,28,25,.05); border-color: var(--rojo); }
+
+/* Total + finalizar */
+.lv-total { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .8rem; }
+.lv-total span { font-family: var(--f-titular); font-weight: 700; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; color: var(--texto-suave); }
+.lv-total b { font-family: var(--f-titular); font-weight: 900; font-size: 1.7rem; color: var(--rojo); font-variant-numeric: tabular-nums; }
+.lv-finalize { width: 100%; justify-content: center; font-size: 1.05rem; padding: .9em 1.4em; }
+.lv-link.back { display: inline-block; margin-bottom: .7rem; }
+
+/* Estado vacío */
+.lv-empty { text-align: center; padding: 2.5rem 1rem; display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.lv-empty-ico { width: 72px; height: 72px; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; margin-bottom: .4rem; }
+.lv-empty-ico svg { width: 40px; height: 40px; stroke: var(--rojo); opacity: .7; }
+.lv-empty .muted { color: var(--texto-suave); font-size: .95rem; max-width: 20rem; }
+.lv-empty .btn { margin-top: 1rem; }
+
+/* Checkout */
+.lv-co { display: flex; flex-direction: column; gap: 1.1rem; }
+.lv-field { display: flex; flex-direction: column; gap: .4rem; }
+.lv-field > span { font-family: var(--f-titular); font-weight: 700; font-size: .92rem; }
+.lv-field > span small { color: var(--texto-suave); font-weight: 600; }
+.lv-field input {
+  font-family: var(--f-texto); font-size: 1rem; color: var(--texto);
+  background: var(--blanco); border: 1.5px solid rgba(41,35,31,.18);
+  border-radius: var(--radio-sm); padding: .75rem .9rem; width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.lv-field input:focus { outline: none; border-color: var(--rojo); box-shadow: 0 0 0 3px rgba(167,28,25,.12); }
+.lv-co-resumen { display: flex; align-items: baseline; justify-content: space-between; padding-top: .6rem; border-top: 1px dashed rgba(41,35,31,.2); }
+.lv-co-resumen span { color: var(--texto-suave); font-weight: 600; }
+.lv-co-resumen b { font-family: var(--f-titular); font-weight: 900; font-size: 1.35rem; color: var(--rojo); }
+
+/* ---------- Modal (personalizar pizza) ---------- */
+.lv-modal { position: fixed; inset: 0; z-index: 120; display: grid; place-items: end center; padding: 0; }
+.lv-modal-card {
+  position: relative; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto;
+  background: var(--crema); border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+  box-shadow: var(--sombra-lg); padding: 1.4rem 1.3rem 1.5rem;
+  transform: translateY(16px); opacity: 0; transition: transform .28s var(--ease-salida), opacity .2s;
+}
+.lv-modal.open .lv-modal-card { transform: translateY(0); opacity: 1; }
+.lv-x-modal { position: absolute; top: 10px; right: 10px; color: var(--texto); background: var(--crema-card); z-index: 2; }
+.lv-x-modal:hover { background: var(--crema-clara); }
+
+.lv-modal-hd { display: flex; gap: .9rem; align-items: center; margin-bottom: 1.2rem; padding-right: 2rem; }
+.lv-modal-foto { width: 76px; height: 76px; flex: 0 0 auto; border-radius: var(--radio); overflow: hidden; background: var(--crema-card); box-shadow: var(--sombra-sm); }
+.lv-modal-foto img { width: 100%; height: 100%; object-fit: cover; }
+.lv-modal-foto .lv-ph { width: 100%; height: 100%; display: grid; place-items: center; }
+.lv-modal-foto .lv-ph svg { width: 48%; stroke: var(--rojo); opacity: .5; }
+.lv-modal-nombre { font-family: var(--f-titular); font-weight: 800; font-size: 1.4rem; line-height: 1.05; }
+.lv-modal-desc { color: var(--texto-suave); font-size: .9rem; margin-top: .25rem; }
+
+.lv-block { margin-bottom: 1.2rem; }
+.lv-block-lab { display: block; font-family: var(--f-titular); font-weight: 700; font-size: .82rem; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-suave); margin-bottom: .55rem; }
+.lv-block-lab small { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+/* Segmented (tamaño / tipo entrega) */
+.lv-seg { display: flex; gap: .5rem; }
+.lv-seg-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: .15rem;
+  background: var(--blanco); border: 1.5px solid rgba(41,35,31,.16); border-radius: var(--radio-sm);
+  padding: .6rem .5rem; font-family: var(--f-titular); font-weight: 700; font-size: .95rem; color: var(--texto);
+  transition: border-color .15s, background .15s, color .15s;
+}
+.lv-seg-btn b { color: var(--rojo); font-weight: 800; font-size: 1.05rem; }
+.lv-seg-btn.on { border-color: var(--rojo); background: rgba(167,28,25,.06); box-shadow: inset 0 0 0 1px var(--rojo); }
+.lv-seg-btn:hover { border-color: var(--rojo); }
+
+/* Adicionales en modal */
+.lv-adics { display: flex; flex-direction: column; gap: .5rem; }
+.lv-adic { display: flex; align-items: center; gap: .7rem; background: var(--blanco); border: 1.5px solid rgba(41,35,31,.1); border-radius: var(--radio-sm); padding: .55rem .7rem; transition: border-color .15s, background .15s; }
+.lv-adic.active { border-color: rgba(167,28,25,.4); background: rgba(167,28,25,.04); }
+.lv-adic.sello { border-color: var(--queso-osc); background: rgba(232,184,61,.1); }
+.lv-adic-ico { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; }
+.lv-adic-ico svg { width: 19px; height: 19px; stroke: var(--rojo); }
+.lv-adic.sello .lv-adic-ico { background: rgba(232,184,61,.35); }
+.lv-adic-txt { flex: 1; min-width: 0; line-height: 1.15; }
+.lv-adic-txt b { font-weight: 600; font-size: .96rem; }
+.lv-adic-txt b em { font-style: italic; font-weight: 600; color: var(--queso-osc); font-size: .82rem; }
+.lv-adic-txt small { display: block; color: var(--texto-suave); font-size: .8rem; }
+
+/* Steppers */
+.lv-stepper { display: inline-flex; align-items: center; gap: .1rem; background: var(--crema-clara); border: 1.5px solid rgba(41,35,31,.14); border-radius: 999px; padding: 2px; }
+.lv-stepper.sm { transform: none; }
+.lv-step { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; font-weight: 700; line-height: 0; color: var(--rojo); transition: background .12s, color .12s; }
+.lv-step:hover:not([disabled]) { background: var(--rojo); color: var(--crema-clara); }
+.lv-step[disabled] { opacity: .3; cursor: not-allowed; }
+.lv-step-n { min-width: 24px; text-align: center; font-family: var(--f-titular); font-weight: 800; font-variant-numeric: tabular-nums; }
+.lv-stepper.big .lv-step { width: 38px; height: 38px; font-size: 1.5rem; }
+.lv-stepper.big .lv-step-n { min-width: 30px; font-size: 1.15rem; }
+
+.lv-modal-foot { display: flex; align-items: center; gap: 1rem; margin-top: 1.3rem; }
+.lv-qtybox { flex: 0 0 auto; display: flex; flex-direction: column; gap: .4rem; align-items: flex-start; }
+.lv-add-btn { flex: 1; justify-content: center; padding: .95em 1.2em; }
+
+@media (min-width: 600px) {
+  .lv-modal { place-items: center; padding: 20px; }
+  .lv-modal-card { border-radius: var(--radio-lg); transform: translateY(24px) scale(.98); }
+  .lv-modal.open .lv-modal-card { transform: translateY(0) scale(1); }
+}
+@media (max-width: 540px) {
+  .lv-fab { top: auto; bottom: 16px; right: 16px; }
+  .lv-fab.bump { animation: lvBump .4s var(--ease-salida); }
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {

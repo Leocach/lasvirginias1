@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel · Las Virginias</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#A71C19" />
+  <link rel="icon" href="assets/isotipo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="admin">
+
+  <!-- ============ LOGIN ============ -->
+  <div class="login-wrap" id="login">
+    <form class="login-card" id="login-form">
+      <img class="iso" src="assets/isotipo.png" alt="Las Virginias" />
+      <h1>Panel de dueños</h1>
+      <p>Las Virginias · El sabor de casa</p>
+      <div class="field">
+        <label for="pass">Contraseña</label>
+        <input type="password" id="pass" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-rojo" style="width:100%;justify-content:center;">Entrar</button>
+      <div class="login-err" id="login-err"></div>
+      <div class="login-hint" id="login-hint"></div>
+    </form>
+  </div>
+
+  <!-- ============ SHELL ============ -->
+  <div id="shell" class="oculto">
+    <div class="admin-top">
+      <div class="contenedor admin-top-in">
+        <div class="brand">
+          <img src="assets/isotipo.png" alt="LV" />
+          <span>Panel<small>EL SABOR DE CASA</small></span>
+        </div>
+        <div class="spacer"></div>
+        <a href="index.html" target="_blank" rel="noopener" id="ver-publico">Ver menú público ↗</a>
+        <span class="sep"></span>
+        <button class="link" id="logout">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="admin-tabs">
+      <div class="contenedor admin-tabs-in">
+        <button class="tab-btn active" data-tab="menu">Menú</button>
+        <button class="tab-btn" data-tab="ia">Contenido con IA</button>
+        <button class="tab-btn" data-tab="ajustes">Ajustes</button>
+      </div>
+    </div>
+
+    <main class="admin-main">
+
+      <!-- ---------- TAB MENÚ ---------- -->
+      <section class="tab-panel active" id="tab-menu">
+        <div class="sec-head">
+          <div>
+            <h2>Pizzas</h2>
+            <p>Edita nombres, descripciones, precios y fotos. Marca como agotada si se acaba.</p>
+          </div>
+        </div>
+        <div id="pizzas-list"></div>
+        <button class="add-btn" id="add-pizza">＋ Agregar pizza</button>
+
+        <div class="sec-head"><div><h2>Adicionales</h2><p>Precio Mediana / Familiar.</p></div></div>
+        <div id="adic-list"></div>
+        <button class="add-btn" id="add-adic">＋ Agregar adicional</button>
+
+        <div class="sec-head"><div><h2>Bebida</h2></div></div>
+        <div class="row-simple" id="bebida-row" style="grid-template-columns:1fr 140px;">
+          <div class="field"><label>Nombre</label><input id="bebida-nombre" /></div>
+          <div class="field"><label>Precio</label><input id="bebida-precio" type="number" step="0.5" min="0" /></div>
+        </div>
+
+        <div class="sec-head"><div><h2>Nota del borde</h2><p>Aparece bajo el menú. Puedes usar &lt;strong&gt; para resaltar.</p></div></div>
+        <div class="field"><textarea id="borde-nota"></textarea></div>
+
+        <div class="save-bar">
+          <span class="estado" id="estado-menu">Los cambios se guardan en este navegador.</span>
+          <div class="spacer"></div>
+          <button class="btn btn-fantasma btn-sm" id="reset-menu">Restablecer</button>
+          <button class="btn btn-rojo" id="save-menu">Guardar cambios</button>
+        </div>
+      </section>
+
+      <!-- ---------- TAB IA ---------- -->
+      <section class="tab-panel" id="tab-ia">
+        <div class="ia-intro">
+          <div class="ico" id="ia-intro-ico"></div>
+          <div>
+            <h2>Generá una promo en segundos</h2>
+            <p>Elegí un producto y qué querés comunicar. Nosotros nos encargamos de que salga con los colores, el estilo y el tono de Las Virginias.</p>
+          </div>
+        </div>
+
+        <div class="ia-grid">
+          <div>
+            <div class="ia-step">
+              <h3><span class="ia-step-num">1</span> ¿Sobre qué producto?</h3>
+              <div class="prod-pick" id="prod-pick"></div>
+            </div>
+
+            <div class="ia-step">
+              <h3><span class="ia-step-num">2</span> ¿Qué querés comunicar?</h3>
+              <div class="choices" id="intent-choices"></div>
+            </div>
+
+            <div class="ia-step">
+              <h3><span class="ia-step-num">3</span> Texto o detalle <span style="font-weight:500;color:var(--texto-suave);font-size:.85rem;">(opcional)</span></h3>
+              <div class="field">
+                <input id="ia-detalle-txt" placeholder="Ej: 2x1 este fin de semana" />
+                <span class="hint">Si lo dejás vacío, ponemos un texto en el tono de la marca.</span>
+              </div>
+            </div>
+
+            <div class="ia-step">
+              <h3><span class="ia-step-num">4</span> Formato</h3>
+              <div class="segmented" id="format-seg"></div>
+            </div>
+
+            <button class="btn btn-rojo btn-lg" id="btn-generar" style="width:100%;justify-content:center;margin-top:.5rem;">
+              <span id="gen-ico"></span> Generar
+            </button>
+          </div>
+
+          <div>
+            <div class="ia-result-card">
+              <div class="ia-canvas-wrap" id="ia-canvas-wrap">
+                <div class="ia-empty" id="ia-empty">
+                  <img src="assets/mascota.png" alt="" />
+                  <p>Tu pieza aparecerá acá.<br />Elegí un producto y dale a <strong>Generar</strong>.</p>
+                </div>
+              </div>
+              <div id="ia-result-info"></div>
+              <div class="ia-result-acc oculto" id="ia-result-acc">
+                <button class="btn btn-fantasma" id="btn-regenerar">↻ Regenerar</button>
+                <button class="btn btn-rojo" id="btn-descargar"><span id="dl-ico"></span> Descargar</button>
+              </div>
+              <div class="ia-galeria" id="ia-galeria"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- TAB AJUSTES ---------- -->
+      <section class="tab-panel" id="tab-ajustes">
+        <div class="sec-head"><div><h2>Contacto y datos</h2><p>Se usan en el menú público (WhatsApp, redes, horario).</p></div></div>
+        <div class="grid-2">
+          <div class="field">
+            <label>WhatsApp</label>
+            <div class="prefix-group"><span class="pre">+</span><input id="c-whatsapp" placeholder="584140000000" /></div>
+            <span class="hint">Con código de país, sin el +. Ej: Venezuela → 584141234567</span>
+          </div>
+          <div class="field"><label>Mensaje inicial de WhatsApp</label><input id="c-wamsg" /></div>
+          <div class="field"><label>Instagram (usuario)</label><input id="c-ig" placeholder="lasvirginias.pizza" /></div>
+          <div class="field"><label>Teléfono</label><input id="c-tel" /></div>
+          <div class="field"><label>Horario</label><input id="c-horario" /></div>
+          <div class="field"><label>Zona / entrega</label><input id="c-zona" /></div>
+        </div>
+        <button class="btn btn-rojo" id="save-contacto">Guardar datos</button>
+
+        <div class="sec-head"><div><h2>Conexión con IA (Kie AI)</h2><p>Para que la generación funcione en vivo hace falta un backend propio.</p></div></div>
+        <div class="info-box">
+          Ahora mismo el panel funciona en <strong>modo demo</strong>: arma una pieza de marca localmente, sin costo ni clave, para que veas el flujo completo y puedas descargarla.<br /><br />
+          Cuando tengas el <strong>backend</strong> que conecta con <strong>Kie AI</strong> (para no exponer la clave en el navegador), pegá acá su dirección y el panel empezará a generar con IA real.
+        </div>
+        <div class="field" style="max-width:520px;">
+          <label>Backend / proxy</label>
+          <input id="c-proxy" placeholder="https://tu-servidor.com/generar" />
+          <span class="hint">Opcional. Dejalo vacío para seguir en modo demo.</span>
+        </div>
+        <button class="btn btn-rojo" id="save-ia">Guardar conexión</button>
+
+        <div class="sec-head"><div><h2 class="danger">Restablecer todo</h2><p>Vuelve el menú y los datos a los valores originales.</p></div></div>
+        <button class="btn btn-fantasma" id="reset-all">Restablecer menú y datos</button>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/brand.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

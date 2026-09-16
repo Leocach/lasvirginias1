@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Las Virginias · El sabor de casa · Pizza en Lagunillas</title>
+  <meta name="description" content="Pizza hecha en casa en Lagunillas, Zulia. La Tequepizza, bordes rellenos de queso y el sabor de siempre. De nuestra casa para la tuya. Pide por WhatsApp." />
+  <meta name="theme-color" content="#A71C19" />
+  <link rel="icon" href="assets/isotipo.png" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Las Virginias · El sabor de casa" />
+  <meta property="og:description" content="Pizza hecha en casa en Lagunillas. La Tequepizza y los bordes rellenos de queso. Pide por WhatsApp." />
+  <meta property="og:image" content="assets/pizza-tequepizza.jpg" />
+  <meta property="og:type" content="website" />
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <div class="franja-vichy"></div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <div class="contenedor header-in">
+      <a class="marca" href="#top" aria-label="Las Virginias inicio">
+        <img src="assets/isotipo-t.png" alt="Las Virginias" />
+        <span class="marca-txt">Las Virginias<small>EL SABOR DE CASA</small></span>
+      </a>
+      <nav class="nav">
+        <a href="#menu">Menú</a>
+        <a href="#tequepizza">Tequepizza</a>
+        <a href="#arma">Arma tu pizza</a>
+        <a href="#contacto">Cómo pedir</a>
+      </nav>
+      <a class="btn btn-wa btn-sm" id="wa-header" href="#" target="_blank" rel="noopener">
+        <span class="wa-ico"></span> Pedir
+      </a>
+      <button class="menu-btn" id="menu-btn" aria-label="Abrir menú">☰</button>
+    </div>
+  </header>
+
+  <!-- Nav móvil -->
+  <div class="nav-movil" id="nav-movil">
+    <div class="nav-movil-panel">
+      <button class="cerrar" id="nav-cerrar" aria-label="Cerrar">✕</button>
+      <a href="#menu">Menú</a>
+      <a href="#tequepizza">Tequepizza</a>
+      <a href="#arma">Arma tu pizza</a>
+      <a href="#contacto">Cómo pedir</a>
+      <a href="#historia">Nuestra historia</a>
+    </div>
+  </div>
+
+  <span id="top"></span>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="contenedor hero-grid">
+      <div class="hero-txt">
+        <img class="hero-logo" src="assets/logo-full-t.png" alt="Las Virginias — El sabor de casa" />
+        <h1 class="hero-saludo">¿Hoy se come <em>pizza</em> o qué?</h1>
+        <p class="hero-sub">Pizza hecha en casa, con receta de familia y <strong>bordes rellenos de queso</strong>. La misma de siempre… con algo más. <strong>De nuestra casa para la tuya.</strong></p>
+        <div class="hero-cta">
+          <a class="btn btn-rojo btn-lg" href="#menu">Ver el menú</a>
+          <a class="btn btn-wa btn-lg" id="wa-hero" href="#" target="_blank" rel="noopener"><span class="wa-ico"></span> Pedir por WhatsApp</a>
+        </div>
+        <p class="hero-meta" id="hero-meta"><!-- lugar + horario por JS --></p>
+      </div>
+      <div class="hero-foto-wrap">
+        <img class="hero-sello" src="assets/sello.png" alt="De nuestra casa para la tuya" />
+        <div class="hero-foto" id="hero-foto">
+          <img class="hero-slide is-active" src="assets/pizza-tequepizza.jpg" alt="Tequepizza de Las Virginias, con borde de tequeño relleno de queso" />
+        </div>
+        <img class="hero-mascota" src="assets/mascota.png" alt="Mascota Las Virginias" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VALORES ============ -->
+  <section class="valores">
+    <div class="contenedor valores-in" id="valores">
+      <!-- llenado por JS -->
+    </div>
+  </section>
+
+  <!-- ============ MENÚ ============ -->
+  <section class="seccion seccion-crema" id="menu">
+    <div class="contenedor">
+      <div class="cab">
+        <h2>Nuestro menú</h2>
+        <p>Cinco pizzas hechas como en casa. Todas se pueden pedir <strong>medianas</strong> o <strong>familiares</strong>, y con <strong>borde relleno de queso</strong>.</p>
+      </div>
+      <div class="menu-grid" id="menu-grid"><!-- pizzas por JS --></div>
+
+      <div class="menu-nota" id="menu-nota"><!-- nota borde por JS --></div>
+
+      <div class="extras-row" id="bebida-row"><!-- bebida por JS --></div>
+    </div>
+  </section>
+
+  <!-- ============ TEQUEPIZZA ============ -->
+  <section class="seccion teque" id="tequepizza">
+    <div class="contenedor teque-grid">
+      <div class="teque-txt">
+        <h2>TEQUEPIZZA</h2>
+        <p>La estrella de la casa. Nuestro borde no se rellena solo: lleva la idea del <strong>tequeño relleno de queso</strong> alrededor de toda la pizza.</p>
+        <p class="frase">Pizza + tequeño. Porque una sola cosa nunca fue suficiente.</p>
+        <div class="teque-precios" id="teque-precios"><!-- precios por JS --></div>
+        <a class="btn btn-queso btn-lg" id="wa-teque" href="#" target="_blank" rel="noopener">Quiero una Tequepizza</a>
+      </div>
+      <div class="teque-foto-wrap">
+        <img class="teque-foto" src="assets/pizza-tequepizza.jpg" alt="Tequepizza con borde de tequeño" />
+        <img class="teque-mascota" src="assets/mascota.png" alt="Mascota Las Virginias" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARMA TU PIZZA ============ -->
+  <section class="seccion seccion-clara" id="arma">
+    <div class="contenedor">
+      <div class="cab">
+        <h2>Arma tu pizza</h2>
+        <p>Súmale lo que quieras. Y recuerda: <strong>cualquier</strong> pizza puede llevar borde relleno de queso.</p>
+      </div>
+      <div class="arma-grid">
+        <div class="arma-foto">
+          <img src="assets/pizza-tequepizza-maiz.jpg" alt="Pizza con borde relleno y maíz" />
+        </div>
+        <div class="arma-txt">
+          <h3 class="arma-titulo">Adicionales</h3>
+          <p class="arma-intro">Súmale lo que quieras a cualquier pizza. Precio por tamaño.</p>
+          <div class="adicionales" id="adicionales"><!-- por JS --></div>
+          <a class="btn btn-rojo" id="wa-arma" href="#" target="_blank" rel="noopener"><span class="wa-ico"></span> Armar mi pedido</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACTO ============ -->
+  <section class="seccion seccion-crema" id="contacto">
+    <div class="contenedor">
+      <div class="cab">
+        <h2>Cómo pedir</h2>
+        <p>Escríbenos, llámanos o pásate por Instagram. Te la llevamos calientica.</p>
+      </div>
+      <div class="contacto-grid">
+        <div class="contacto-card">
+          <div class="contacto-lista" id="contacto-lista"><!-- por JS --></div>
+          <div class="contacto-cta" id="contacto-cta"><!-- botones por JS --></div>
+        </div>
+        <div class="qr-card">
+          <h3>Escanea y ordena</h3>
+          <p>Guarda el menú en tu teléfono</p>
+          <div class="qr-box" id="qr-box"></div>
+          <img class="isotipo-mini" src="assets/isotipo.png" alt="LV" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HISTORIA ============ -->
+  <section class="seccion historia" id="historia">
+    <div class="contenedor historia-grid">
+      <div class="historia-sello">
+        <img src="assets/sello.png" alt="De nuestra casa para la tuya" />
+      </div>
+      <div>
+        <h2>Una pizza que sabe a casa</h2>
+        <p class="frase">Más que pizza, mejores momentos.</p>
+        <p>Las Virginias nació en una casa de Lagunillas, con una receta de familia y las ganas de compartir la pizza que a nosotros nos gusta comer. Nada de fábrica: masa, queso y cariño, como se hace en casa.</p>
+        <p>No somos la más barata ni la más gourmet. Somos la pizza familiar que tiene algo especial — ese borde de queso que se volvió nuestra Tequepizza.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="contenedor">
+      <div class="footer-grid">
+        <div class="footer-marca">
+          <img src="assets/logo-cream.png" alt="Las Virginias" />
+          <p>Pizza hecha en casa. Con algo más. Lagunillas, Estado Zulia. Delivery y take away.</p>
+        </div>
+        <div>
+          <h3>Menú</h3>
+          <div class="footer-links">
+            <a href="#menu">Nuestras pizzas</a>
+            <a href="#tequepizza">Tequepizza</a>
+            <a href="#arma">Adicionales</a>
+          </div>
+        </div>
+        <div>
+          <h3>Contacto</h3>
+          <div class="footer-links" id="footer-contacto"><!-- por JS --></div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="marca-linea">Las Virginias <span>·</span> El sabor de casa. <span>·</span> Lagunillas, Zulia</span>
+        <a class="panel-link" href="admin.html">Panel de dueños →</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/public.js"></script>
+</body>
+</html>

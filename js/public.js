@@ -5,7 +5,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  const { getData, saveData, precio, icon, API } = window.LV;
+  const { getData, saveData, precio, icon, adicImg, normAdic, API } = window.LV;
   const $ = (s, r = document) => r.querySelector(s);
 
   let data = getData(); // caché local / semilla; se reemplaza si llega el remoto
@@ -53,9 +53,7 @@
   function renderData(d) {
     data = d;
 
-    // WhatsApp (dependen de data.contacto)
-    setWa('wa-hero');
-    setWa('wa-arma', 'quiero armar mi pizza:');
+    // (El hero ya no lleva botón de WhatsApp; "Armar mi pedido" abre el carrito.)
 
     // Metadato del hero (lugar)
     const heroMeta = document.getElementById('hero-meta');
@@ -82,14 +80,19 @@
         </div>
       </article>`).join('');
 
-    // Nota de borde
-    $('#menu-nota').innerHTML = `${icon('queso')}<span>${data.bordeNota || ''}</span>`;
+    // Nota de borde (usa el ícono ilustrado del borde relleno)
+    const bordeAdic = (data.adicionales || []).find(a => normAdic(a.nombre) === 'borde relleno de queso');
+    const bordeImg = (bordeAdic && adicImg(bordeAdic)) || 'assets/adic-borde.png';
+    $('#menu-nota').innerHTML = `<img class="menu-nota-ico" src="${bordeImg}" alt="" />
+      <span>${data.bordeNota || ''}</span>`;
 
     // Bebida
     if (data.bebida && data.bebida.nombre) {
+      const drinkImg = adicImg(data.bebida);
+      const drinkIco = drinkImg ? `<img src="${drinkImg}" alt="" />` : icon('bebida');
       $('#bebida-row').innerHTML = `
         <div class="chip-bebida">
-          <span class="ico">${icon('bebida')}</span>
+          <span class="ico">${drinkIco}</span>
           <b>${data.bebida.nombre}</b>
           <span>${precio(data.bebida.precio)}</span>
           <button class="chip-add" type="button" data-add-drink="1" aria-label="Agregar bebida al pedido">＋</button>
@@ -130,7 +133,7 @@
       return it.href ? `<a class="contacto-item" href="${it.href}" target="_blank" rel="noopener">${inner}</a>` : `<div class="contacto-item">${inner}</div>`;
     }).join('');
     $('#contacto-cta').innerHTML = `
-      <a class="btn btn-wa" href="${waLink()}" target="_blank" rel="noopener"><span class="wa-ico">${icon('whatsapp')}</span> Pedir por WhatsApp</a>
+      <a class="btn btn-wa" href="${waLink()}" target="_blank" rel="noopener"><span class="wa-ico">${icon('whatsapp')}</span> WhatsApp</a>
       <a class="btn btn-crema" href="${igUrl}" target="_blank" rel="noopener">Ver Instagram</a>`;
 
     // Footer contacto

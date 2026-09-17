@@ -51,7 +51,7 @@
       // El borde relleno es el sello de la casa: se trata como adicional para poder
       // ponerle precio desde el panel. Regla especial: solo 1 vez por pizza (unico)
       // y no aplica a la Tequepizza (ya lo trae de fábrica).
-      { id: 'borde-relleno', nombre: 'Borde relleno de queso', ico: 'queso', mediana: 2, familiar: 3, unico: true, sello: true },
+      { id: 'borde-relleno', nombre: 'Borde relleno de queso', ico: 'queso', img: 'assets/adic-borde.png', mediana: 2, familiar: 3, unico: true, sello: true },
       { id: 'mozzarella', nombre: 'Queso mozzarella', ico: 'queso', mediana: 1.5, familiar: 2.5 },
       { id: 'pimenton-cebolla', nombre: 'Pimentón o cebolla', ico: 'pimenton', mediana: 1, familiar: 1.5 },
       { id: 'maiz', nombre: 'Maíz', ico: 'maiz', mediana: 1.5, familiar: 2.5 },
@@ -139,6 +139,52 @@
   }
 
   /* ============================================================
+     Íconos ilustrados de adicionales (carpeta 08 → assets)
+     Fuente única para página pública, carrito y panel de dueños.
+     Cada adicional puede fijar su propio `img`; si no, se resuelve
+     por NOMBRE (normalizado). El panel permite cambiarlo.
+     ============================================================ */
+  const ADIC_ICONS = [
+    { v: 'assets/adic-borde.png',      l: 'Borde relleno' },
+    { v: 'assets/adic-mozzarella.png', l: 'Mozzarella' },
+    { v: 'assets/adic-pimenton.png',   l: 'Pimentón' },
+    { v: 'assets/adic-cebolla.png',    l: 'Cebolla' },
+    { v: 'assets/adic-maiz.png',       l: 'Maíz' },
+    { v: 'assets/adic-tocineta.png',   l: 'Tocineta' },
+    { v: 'assets/adic-champinon.png',  l: 'Champiñón' },
+    { v: 'assets/adic-peperoni.png',   l: 'Peperoni' },
+    { v: 'assets/adic-salami.png',     l: 'Salami' },
+    { v: 'assets/adic-refresco.png',   l: 'Refresco' }
+  ];
+  // Mapa por nombre (normalizado) → imagen, para datos que aún no traen `img`.
+  const ADIC_ICON_MAP = {
+    'borde relleno de queso': 'assets/adic-borde.png',
+    'queso mozzarella': 'assets/adic-mozzarella.png',
+    'mozzarella': 'assets/adic-mozzarella.png',
+    'pimenton': 'assets/adic-pimenton.png',
+    'pimenton o cebolla': 'assets/adic-pimenton.png',
+    'cebolla': 'assets/adic-cebolla.png',
+    'maiz': 'assets/adic-maiz.png',
+    'tocineta': 'assets/adic-tocineta.png',
+    'champinon': 'assets/adic-champinon.png',
+    'champinones': 'assets/adic-champinon.png',
+    'peperoni': 'assets/adic-peperoni.png',
+    'salami': 'assets/adic-salami.png',
+    'refresco 1 5 lts': 'assets/adic-refresco.png'
+  };
+  function normAdic(s) {
+    return String(s || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  // Devuelve la ruta de imagen del adicional (explícita o por nombre), o '' si no hay.
+  function adicImg(a) {
+    if (a && a.img) return a.img;
+    if (!a) return '';
+    return ADIC_ICON_MAP[normAdic(a.nombre)] || '';
+  }
+
+  /* ============================================================
      Backend remoto (Vercel) — menú compartido para todos
      Si el backend no está desplegado/configurado, cada función
      devuelve un estado que el resto del sitio maneja con gracia
@@ -184,6 +230,10 @@
     precio,
     icon,
     ICON_PATHS,
+    ADIC_ICONS,
+    ADIC_ICON_MAP,
+    normAdic,
+    adicImg,
     API
   };
 })();

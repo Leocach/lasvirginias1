@@ -260,12 +260,14 @@ html { accent-color: var(--rojo); }
   background: var(--crema-card); border: 2px dashed rgba(167,28,25,.35); border-radius: var(--radio); padding: 1.1rem 1.4rem; text-align: center; }
 .menu-nota strong { color: var(--rojo); font-family: var(--f-titular); }
 .menu-nota svg { width: 34px; height: 34px; stroke: var(--rojo); flex: 0 0 auto; }
+.menu-nota img.menu-nota-ico { width: 52px; height: 52px; object-fit: contain; flex: 0 0 auto; }
 
 /* ---------- Bebida chip ---------- */
 .extras-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1.4rem; }
 .chip-bebida { display: inline-flex; align-items: center; gap: .7rem; background: var(--blanco); border: 1px solid rgba(41,35,31,.08); box-shadow: var(--sombra-sm); border-radius: 999px; padding: .55rem 1.1rem .55rem .7rem; }
-.chip-bebida .ico { width: 38px; height: 38px; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; }
+.chip-bebida .ico { width: 38px; height: 38px; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; overflow: hidden; }
 .chip-bebida .ico svg { width: 20px; height: 20px; stroke: var(--rojo); }
+.chip-bebida .ico img { width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box; }
 .chip-bebida b { font-family: var(--f-titular); }
 .chip-bebida span { color: var(--rojo); font-family: var(--f-titular); font-weight: 800; }
 
@@ -481,8 +483,9 @@ html { accent-color: var(--rojo); }
 
 /* Bebida en el panel */
 .lv-drink { display: flex; align-items: center; gap: .7rem; margin-top: .8rem; background: var(--blanco); border: 1px solid rgba(41,35,31,.08); border-radius: var(--radio); padding: .7rem .95rem; box-shadow: var(--sombra-sm); }
-.lv-drink-ico { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; }
+.lv-drink-ico { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; overflow: hidden; }
 .lv-drink-ico svg { width: 20px; height: 20px; stroke: var(--rojo); }
+.lv-drink-ico img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; }
 .lv-drink-txt { flex: 1; line-height: 1.15; }
 .lv-drink-txt b { font-family: var(--f-titular); }
 .lv-drink-txt small { display: block; color: var(--texto-suave); font-size: .8rem; }
@@ -561,8 +564,9 @@ html { accent-color: var(--rojo); }
 .lv-adic { display: flex; align-items: center; gap: .7rem; background: var(--blanco); border: 1.5px solid rgba(41,35,31,.1); border-radius: var(--radio-sm); padding: .55rem .7rem; transition: border-color .15s, background .15s; }
 .lv-adic.active { border-color: rgba(167,28,25,.4); background: rgba(167,28,25,.04); }
 .lv-adic.sello { border-color: var(--queso-osc); background: rgba(232,184,61,.1); }
-.lv-adic-ico { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; }
+.lv-adic-ico { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%; background: var(--crema-card); display: grid; place-items: center; overflow: hidden; }
 .lv-adic-ico svg { width: 19px; height: 19px; stroke: var(--rojo); }
+.lv-adic-ico .lv-adic-img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; }
 .lv-adic.sello .lv-adic-ico { background: rgba(232,184,61,.35); }
 .lv-adic-txt { flex: 1; min-width: 0; line-height: 1.15; }
 .lv-adic-txt b { font-weight: 600; font-size: .96rem; }

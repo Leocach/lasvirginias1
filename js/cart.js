@@ -14,6 +14,15 @@
   const MAX_ADIC = 2;                 // veces por adicional en una pizza
   const CART_KEY = 'lasvirginias_cart_v1';
 
+  // Ícono ilustrado del adicional (fuente compartida en data.js). Si no hay
+  // imagen asociada, cae al ícono SVG de línea.
+  function adicIco(a) {
+    const src = LV.adicImg(a);
+    return src
+      ? `<img class="lv-adic-img" src="${src}" alt="" loading="lazy">`
+      : icon((a && a.ico) || 'porcion');
+  }
+
   let MENU = LV._data || LV.getData();
 
   /* ---------- Estado del pedido ---------- */
@@ -210,7 +219,7 @@
             const mx = maxFor(a);
             return `
             <div class="lv-adic ${a.sello ? 'sello' : ''} ${n > 0 ? 'active' : ''}">
-              <span class="lv-adic-ico">${icon(a.ico || 'porcion')}</span>
+              <span class="lv-adic-ico">${adicIco(a)}</span>
               <span class="lv-adic-txt">
                 <b>${a.nombre}${a.sello ? ' <em>· el sello de la casa</em>' : ''}</b>
                 <small>+${precio(a[draft.size])}${a.unico ? ' · 1 por pizza' : ''}</small>
@@ -342,7 +351,7 @@
 
     const drinkBlock = MENU.bebida && MENU.bebida.nombre ? `
       <div class="lv-drink">
-        <span class="lv-drink-ico">${icon('bebida')}</span>
+        <span class="lv-drink-ico">${adicIco(MENU.bebida)}</span>
         <span class="lv-drink-txt"><b>${MENU.bebida.nombre}</b><small>${precio(MENU.bebida.precio)} c/u</small></span>
         <span class="lv-stepper sm">
           <button type="button" class="lv-step" data-drink-dec ${drinkQty <= 0 ? 'disabled' : ''} aria-label="Menos">−</button>
@@ -500,6 +509,8 @@
 
   // Botones "Agregar" de las tarjetas de pizza y de la bebida (delegación)
   document.addEventListener('click', (e) => {
+    const openCart = e.target.closest('[data-open-cart]');
+    if (openCart) { e.preventDefault(); openDrawer('cart'); return; }
     const add = e.target.closest('[data-add]');
     if (add) { openCustomizer(add.getAttribute('data-add')); return; }
     const drink = e.target.closest('[data-add-drink]');

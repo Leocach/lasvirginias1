@@ -3,7 +3,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  const { getData, saveData, resetData, precio, icon, API } = window.LV;
+  const { getData, saveData, resetData, precio, icon, adicImg, ADIC_ICONS, API } = window.LV;
   const B = window.LVBrand;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -167,9 +167,17 @@
       '</div>';
   }
 
+  function adicIcoThumb(a) {
+    const src = adicImg(a);
+    return src ? '<img src="' + attr(src) + '" alt="">' : icon((a && a.ico) || 'queso');
+  }
   function adicRow(a, i) {
     return '' +
-      '<div class="row-simple" data-idx="' + i + '">' +
+      '<div class="row-simple has-ico" data-idx="' + i + '">' +
+        '<div class="a-ico-cell">' +
+          '<div class="a-ico-thumb" data-act="adicico" data-idx="' + i + '" role="button" tabindex="0" title="Cambiar ícono">' + adicIcoThumb(a) + '</div>' +
+          '<button type="button" class="a-ico-lnk" data-act="adicico" data-idx="' + i + '">Ícono</button>' +
+        '</div>' +
         '<div class="field"><label>Adicional</label><input class="a-nombre" value="' + attr(a.nombre) + '"></div>' +
         '<div class="field"><label>Mediana ($)</label><input class="a-med" type="number" step="0.5" min="0" value="' + esc(a.mediana) + '"></div>' +
         '<div class="field"><label>Familiar ($)</label><input class="a-fam" type="number" step="0.5" min="0" value="' + esc(a.familiar) + '"></div>' +
@@ -182,6 +190,7 @@
     $('#adic-list').innerHTML = work.adicionales.map(adicRow).join('');
     $('#bebida-nombre').value = work.bebida ? work.bebida.nombre : '';
     $('#bebida-precio').value = work.bebida ? work.bebida.precio : '';
+    const bebThumb = $('#bebida-ico-thumb'); if (bebThumb) bebThumb.innerHTML = adicIcoThumb(work.bebida);
     $('#borde-nota').value = work.bordeNota || '';
   }
 
@@ -222,6 +231,8 @@
         if (confirm('¿Eliminar "' + (work.pizzas[i].nombre || 'esta pizza') + '"?')) { syncFromDOM(); work.pizzas.splice(i, 1); renderMenuTab(); toast('Pizza eliminada (recuerda Guardar).'); }
       }
       else if (act === 'deladic') { syncFromDOM(); work.adicionales.splice(i, 1); renderMenuTab(); }
+      else if (act === 'adicico') { syncFromDOM(); openIcoPicker({ type: 'adic', idx: i }); }
+      else if (act === 'bebidaico') { syncFromDOM(); openIcoPicker({ type: 'bebida' }); }
     });
 
     // Toggle disponible → refleja etiqueta al instante
@@ -242,7 +253,7 @@
     });
     $('#add-adic').addEventListener('click', () => {
       syncFromDOM();
-      work.adicionales.push({ id: 'adic-' + Date.now(), nombre: 'Nuevo adicional', ico: 'queso', mediana: 0, familiar: 0 });
+      work.adicionales.push({ id: 'adic-' + Date.now(), nombre: 'Nuevo adicional', ico: 'queso', img: '', mediana: 0, familiar: 0 });
       renderMenuTab();
     });
 
@@ -312,6 +323,86 @@
       };
       fr.onerror = reject; fr.readAsDataURL(file);
     });
+  }
+
+  /* ============================================================
+     Selector de íconos de adicionales / bebida
+     El ícono elegido se guarda en el campo `img` del adicional
+     (preset de la carpeta 08 o imagen propia subida por el dueño).
+     ============================================================ */
+  let icoTarget = null;
+  const icoInput = document.createElement('input');
+  icoInput.type = 'file'; icoInput.accept = 'image/*'; icoInput.style.display = 'none';
+  document.body.appendChild(icoInput);
+  icoInput.addEventListener('change', () => {
+    const file = icoInput.files && icoInput.files[0]; icoInput.value = '';
+    if (!file || !icoTarget) return;
+    reduceIcon(file).then(dataUrl => { setIco(dataUrl); toast('Ícono actualizado (recuerda Guardar).'); })
+      .catch(() => toast('No se pudo leer la imagen.'));
+  });
+
+  // Reduce un ícono conservando transparencia (PNG, máx 160px).
+  function reduceIcon(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 160, scale = Math.min(1, max / Math.max(img.width, img.height));
+          const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+          const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          cv.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(cv.toDataURL('image/png'));
+        };
+        img.onerror = reject; img.src = fr.result;
+      };
+      fr.onerror = reject; fr.readAsDataURL(file);
+    });
+  }
+
+  function buildIcoPicker() {
+    if ($('#adicIcoModal')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'ico-modal oculto'; wrap.id = 'adicIcoModal';
+    wrap.innerHTML =
+      '<div class="ico-modal-card">' +
+        '<div class="ico-modal-head"><b>Elegí un ícono</b>' +
+          '<button type="button" class="ico-close" id="adicIcoClose" aria-label="Cerrar">' + icon('x') + '</button></div>' +
+        '<div class="ico-grid" id="adicIcoGrid"></div>' +
+        '<button type="button" class="add-btn" id="adicIcoUpload">⤴ Subir imagen propia</button>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) closeIcoPicker(); });
+    $('#adicIcoClose').addEventListener('click', closeIcoPicker);
+    $('#adicIcoUpload').addEventListener('click', () => icoInput.click());
+    $('#adicIcoGrid').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-ico]'); if (!b) return;
+      setIco(b.dataset.ico);
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeIcoPicker(); });
+  }
+
+  function currentIco() {
+    if (!icoTarget) return '';
+    if (icoTarget.type === 'bebida') return (work.bebida && work.bebida.img) || adicImg(work.bebida);
+    const a = work.adicionales[icoTarget.idx]; return a ? (a.img || adicImg(a)) : '';
+  }
+  function openIcoPicker(target) {
+    buildIcoPicker();
+    icoTarget = target;
+    const cur = currentIco();
+    $('#adicIcoGrid').innerHTML = ADIC_ICONS.map(ic =>
+      '<button type="button" class="ico-opt' + (cur === ic.v ? ' sel' : '') + '" data-ico="' + attr(ic.v) + '">' +
+        '<img src="' + attr(ic.v) + '" alt=""><small>' + esc(ic.l) + '</small></button>'
+    ).join('');
+    $('#adicIcoModal').classList.remove('oculto');
+  }
+  function closeIcoPicker() { const m = $('#adicIcoModal'); if (m) m.classList.add('oculto'); }
+  function setIco(v) {
+    if (!icoTarget) return;
+    if (icoTarget.type === 'bebida') { if (!work.bebida) work.bebida = {}; work.bebida.img = v; }
+    else { const a = work.adicionales[icoTarget.idx]; if (a) a.img = v; }
+    closeIcoPicker(); renderMenuTab();
   }
 
   /* ============================================================

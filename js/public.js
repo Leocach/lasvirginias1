@@ -54,8 +54,7 @@
     data = d;
 
     // WhatsApp (dependen de data.contacto)
-    setWa('wa-header'); setWa('wa-hero');
-    setWa('wa-teque', 'quiero una Tequepizza 🧀');
+    setWa('wa-hero');
     setWa('wa-arma', 'quiero armar mi pizza:');
 
     // Metadato del hero (lugar)
@@ -190,7 +189,7 @@
     if (!frame) return;
     const fotos = [
       { src: 'assets/pizza-tequepizza.jpg', alt: 'Tequepizza de Las Virginias, con borde de tequeño relleno de queso' },
-      { src: 'assets/pizza-gemini.jpg', alt: 'Pizza Cuatro Estaciones de Las Virginias' },
+      { src: 'assets/pizza-cuatro-estaciones.jpg', alt: 'Pizza Cuatro Estaciones de Las Virginias' },
       { src: 'assets/pizza-tequepizza-maiz.jpg', alt: 'Pizza casera con borde relleno de queso y maíz' },
       { src: 'assets/pizza-tocineta-maiz.jpg', alt: 'Pizza casera con tocineta y maíz' }
     ];

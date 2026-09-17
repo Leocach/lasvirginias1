@@ -78,7 +78,7 @@
   root.id = 'lv-cart-root';
   root.innerHTML = `
     <button id="lvFab" class="lv-fab empty" type="button" aria-label="Tu pedido">
-      <span class="lv-fab-ico">${icon('porcion')}</span>
+      <span class="lv-fab-ico">${icon('pizza')}</span>
       <span class="lv-fab-main">
         <span class="lv-fab-label">Haz tu pedido</span>
         <span class="lv-fab-sub" hidden></span>
@@ -305,7 +305,7 @@
     if (cart.length === 0 && drinkQty === 0) {
       drawerBody.innerHTML = `
         <div class="lv-empty">
-          <div class="lv-empty-ico">${icon('porcion')}</div>
+          <div class="lv-empty-ico">${icon('pizza')}</div>
           <p><b>Tu pedido está vacío</b></p>
           <p class="muted">Elige una pizza del menú para empezar a armarlo.</p>
           <button type="button" class="btn btn-rojo" data-see-menu>Ver el menú</button>

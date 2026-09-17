@@ -12,11 +12,11 @@
      Fuente: Brief-Menu-Digital-IA.md (anexo 8). Precios en USD. */
   const DEFAULT = {
     contacto: {
-      whatsapp: '584140000000',                 // ← EDITAR: número real con código de país, sin +
+      whatsapp: '541149705616',                  // código de país + número, sin +
       whatsappMsg: 'Hola Las Virginias 👋 quiero hacer un pedido:',
       instagram: 'lasvirginias.pizza',
-      telefono: '+58 414 000 0000',              // ← EDITAR
-      horario: 'Mar a Dom · 5:00 pm – 10:00 pm',
+      telefono: '+54 11 4970 5616',
+      horario: 'Mier a Dom · 5:00 pm – 10:00 pm',
       zona: 'Lagunillas, Zulia · Delivery y take away'
     },
     bordeNota: 'Cualquier pizza puede pedirse con <strong>borde relleno de queso</strong> — el sello de la casa.',
@@ -24,12 +24,12 @@
       {
         id: 'napoli', nombre: 'Napoli', ico: 'porcion',
         desc: 'La clásica de siempre: salsa, queso y ganas de repetir.',
-        mediana: 7, familiar: 9, foto: '', badge: '', disponible: true
+        mediana: 7, familiar: 9, foto: 'assets/pizza-napoli.jpg', badge: '', disponible: true
       },
       {
         id: 'jamon-queso', nombre: 'Jamón y Queso', ico: 'porcion',
         desc: 'La más pedida de la casa. Simple, generosa y siempre buena idea.',
-        mediana: 8, familiar: 10, foto: '', badge: 'top', disponible: true
+        mediana: 8, familiar: 10, foto: 'assets/pizza-jamon-queso.jpg', badge: 'top', disponible: true
       },
       {
         id: 'tequepizza', nombre: 'Tequepizza', ico: 'queso',
@@ -39,12 +39,12 @@
       {
         id: 'salchipizza', nombre: 'Salchipizza', ico: 'porcion',
         desc: 'Con salchicha y su toque de salsa tártara. Distinta, sabrosa y con actitud.',
-        mediana: 12, familiar: 14, foto: '', badge: '', disponible: true
+        mediana: 12, familiar: 14, foto: 'assets/pizza-salchipizza.jpg', badge: '', disponible: true
       },
       {
         id: 'cuatro-estaciones', nombre: 'Cuatro Estaciones', ico: 'porcion',
         desc: 'Cuatro sabores en una: tocineta, maíz, pimentón y cebolla. Para los que no saben decidir.',
-        mediana: 10, familiar: 12, foto: 'assets/pizza-gemini.jpg', badge: '', disponible: true
+        mediana: 10, familiar: 12, foto: 'assets/pizza-cuatro-estaciones.jpg', badge: '', disponible: true
       }
     ],
     adicionales: [
@@ -104,7 +104,8 @@
      ============================================================ */
   const ICON_PATHS = {
     porcion: '<path d="M12 3.5c4.5 0 8.3 2 10 4.2L12 20.5 2 7.7C3.7 5.5 7.5 3.5 12 3.5Z"/><circle cx="9" cy="9.5" r=".6" fill="currentColor" stroke="none"/><circle cx="13.5" cy="8.5" r=".6" fill="currentColor" stroke="none"/><circle cx="11.5" cy="13" r=".6" fill="currentColor" stroke="none"/>',
-    queso: '<path d="M3 15.5 15 6c2.8.5 5 2.5 6 5.5L9 20.5c-3-.6-5.2-2.4-6-5Z"/><circle cx="9" cy="13.5" r="1"/><circle cx="13" cy="11.5" r="1"/><circle cx="7" cy="16.5" r=".7"/>',
+    pizza: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.2"/><circle cx="10" cy="10.2" r="1.05" fill="currentColor" stroke="none"/><circle cx="14.2" cy="12" r="1.05" fill="currentColor" stroke="none"/><circle cx="10.7" cy="14.4" r=".9" fill="currentColor" stroke="none"/>',
+    queso: '<path d="M3.8 16.2 18.5 7.6a1.6 1.6 0 0 1 2.4 1.4v6.2a1.6 1.6 0 0 1-1.6 1.6H5.4a1.6 1.6 0 0 1-1.6-1.6Z"/><circle cx="9" cy="13.7" r="1.1"/><circle cx="13.8" cy="12.5" r="1"/><circle cx="17" cy="14.4" r=".8"/>',
     tomate: '<circle cx="12" cy="14" r="6.5"/><path d="M12 7.5c0-2 1.5-3 3-3M12 7.5c0-1.5-1.2-2.4-2.6-2.4"/>',
     champinon: '<path d="M5 12a7 7 0 0 1 14 0Z"/><path d="M10 12v4.5a2 2 0 0 0 4 0V12"/>',
     hoja: '<path d="M5 19C5 11 11 5 19 5c0 8-6 14-14 14Z"/><path d="M9 15 5 19"/>',

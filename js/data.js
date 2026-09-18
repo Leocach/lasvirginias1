@@ -57,7 +57,14 @@
       { id: 'maiz', nombre: 'Maíz', ico: 'maiz', mediana: 1.5, familiar: 2.5 },
       { id: 'tocineta-otros', nombre: 'Tocineta, champiñón, peperoni o salami', ico: 'tocineta', mediana: 2, familiar: 3 }
     ],
-    bebida: { nombre: 'Refresco 1.5 Lts', precio: 2 }
+    bebida: { nombre: 'Refresco 1.5 Lts', precio: 2 },
+    envio: {
+      zonas: [
+        { id: 'z1', precio: 1.5, campos: 'Campo grande, Campo milagro, Bella vista, Florida pequeña, Puerto nuevo' },
+        { id: 'z2', precio: 2.5, campos: 'Florida grande, Delicias, Campo Carabobo' },
+        { id: 'z3', precio: 3.5, campos: 'Campo alegría, Campo terminal, Campo rojo, Las palmas' }
+      ]
+    }
   };
 
   /* ---------- Store helpers ---------- */

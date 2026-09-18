@@ -185,9 +185,32 @@
       '</div>';
   }
 
+  function zonaRow(z, i) {
+    return '' +
+      '<div class="row-simple zona-row" data-zidx="' + i + '">' +
+        '<div class="field"><label>Campos de esta zona <small>(separados por coma)</small></label>' +
+          '<input class="z-campos" value="' + attr(z.campos) + '" placeholder="Campo grande, Bella vista, …"></div>' +
+        '<div class="field"><label>Envío ($)</label><input class="z-precio" type="number" step="0.5" min="0" value="' + esc(z.precio) + '"></div>' +
+        '<button class="del-x" type="button" data-act="delzona" data-idx="' + i + '" title="Eliminar zona">' + icon('x') + '</button>' +
+      '</div>';
+  }
+
+  // Garantiza que exista work.envio.zonas (si el menú guardado no lo trae aún)
+  function ensureEnvio() {
+    if (!work.envio || typeof work.envio !== 'object') work.envio = {};
+    if (!Array.isArray(work.envio.zonas)) {
+      const d = (window.LV.DEFAULT && window.LV.DEFAULT.envio && window.LV.DEFAULT.envio.zonas) || [];
+      work.envio.zonas = JSON.parse(JSON.stringify(d));
+    }
+    // Normaliza: campos como texto legible
+    work.envio.zonas.forEach(z => { if (Array.isArray(z.campos)) z.campos = z.campos.join(', '); });
+  }
+
   function renderMenuTab() {
+    ensureEnvio();
     $('#pizzas-list').innerHTML = work.pizzas.map(pizzaCard).join('');
     $('#adic-list').innerHTML = work.adicionales.map(adicRow).join('');
+    $('#delivery-list').innerHTML = work.envio.zonas.map(zonaRow).join('');
     $('#bebida-nombre').value = work.bebida ? work.bebida.nombre : '';
     $('#bebida-precio').value = work.bebida ? work.bebida.precio : '';
     const bebThumb = $('#bebida-ico-thumb'); if (bebThumb) bebThumb.innerHTML = adicIcoThumb(work.bebida);
@@ -211,6 +234,12 @@
       a.mediana = num($('.a-med', row).value);
       a.familiar = num($('.a-fam', row).value);
     });
+    ensureEnvio();
+    $$('#delivery-list .zona-row').forEach(row => {
+      const i = +row.dataset.zidx; const z = work.envio.zonas[i]; if (!z) return;
+      z.campos = $('.z-campos', row).value.trim();
+      z.precio = num($('.z-precio', row).value);
+    });
     if (!work.bebida) work.bebida = {};
     work.bebida.nombre = $('#bebida-nombre').value.trim();
     work.bebida.precio = num($('#bebida-precio').value);
@@ -231,6 +260,7 @@
         if (confirm('¿Eliminar "' + (work.pizzas[i].nombre || 'esta pizza') + '"?')) { syncFromDOM(); work.pizzas.splice(i, 1); renderMenuTab(); toast('Pizza eliminada (recuerda Guardar).'); }
       }
       else if (act === 'deladic') { syncFromDOM(); work.adicionales.splice(i, 1); renderMenuTab(); }
+      else if (act === 'delzona') { syncFromDOM(); work.envio.zonas.splice(i, 1); renderMenuTab(); }
       else if (act === 'adicico') { syncFromDOM(); openIcoPicker({ type: 'adic', idx: i }); }
       else if (act === 'bebidaico') { syncFromDOM(); openIcoPicker({ type: 'bebida' }); }
     });
@@ -256,11 +286,21 @@
       work.adicionales.push({ id: 'adic-' + Date.now(), nombre: 'Nuevo adicional', ico: 'queso', img: '', mediana: 0, familiar: 0 });
       renderMenuTab();
     });
+    $('#add-zona').addEventListener('click', () => {
+      syncFromDOM();
+      work.envio.zonas.push({ id: 'z-' + Date.now(), campos: '', precio: 0 });
+      renderMenuTab();
+      const rows = $$('#delivery-list .zona-row'); const last = rows[rows.length - 1];
+      if (last) { last.scrollIntoView({ behavior: 'smooth', block: 'center' }); $('.z-campos', last).focus(); }
+    });
 
     $('#save-menu').addEventListener('click', async () => {
       syncFromDOM();
       // normaliza ids
       work.pizzas.forEach(p => { if (!p.id) p.id = slug(p.nombre); });
+      if (work.envio && Array.isArray(work.envio.zonas)) {
+        work.envio.zonas.forEach((z, k) => { if (!z.id) z.id = 'z-' + Date.now() + '-' + k; });
+      }
       saveData(work);                 // caché local siempre
       renderIaTab();                  // refresca miniaturas de la pestaña IA
 

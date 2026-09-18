@@ -523,6 +523,44 @@ html { accent-color: var(--rojo); }
 .lv-co-resumen span { color: var(--texto-suave); font-weight: 600; }
 .lv-co-resumen b { font-family: var(--f-titular); font-weight: 900; font-size: 1.35rem; color: var(--rojo); }
 
+/* Resumen con subtotal + envío + total */
+.lv-co-tot { display: flex; flex-direction: column; gap: .35rem; padding-top: .7rem; border-top: 1px dashed rgba(41,35,31,.2); }
+.lv-co-row { display: flex; align-items: baseline; justify-content: space-between; font-size: .95rem; }
+.lv-co-row > span { color: var(--texto-suave); font-weight: 600; }
+.lv-co-row em { font-style: normal; color: var(--rojo); font-weight: 700; }
+.lv-co-grand { margin-top: .25rem; padding-top: .45rem; border-top: 1px solid rgba(41,35,31,.12); }
+.lv-co-grand b { font-family: var(--f-titular); font-weight: 900; font-size: 1.35rem; color: var(--rojo); }
+
+/* Selector de zona de delivery */
+.lv-zone-toggle {
+  display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left;
+  background: var(--blanco); border: 1.5px solid rgba(41,35,31,.18); border-radius: var(--radio-sm);
+  padding: .75rem .9rem; font-family: var(--f-texto); font-size: 1rem; color: var(--texto-suave);
+  transition: border-color .15s, box-shadow .15s;
+}
+.lv-zone-toggle:hover { border-color: var(--rojo); }
+.lv-zone-toggle.sel { color: var(--texto); border-color: rgba(167,28,25,.4); }
+.lv-zone-toggle.open { border-color: var(--rojo); box-shadow: 0 0 0 3px rgba(167,28,25,.12); }
+.lv-zone-cur { flex: 1; min-width: 0; line-height: 1.25; font-weight: 600; }
+.lv-zone-cur-price { flex: 0 0 auto; font-family: var(--f-titular); font-weight: 800; color: var(--rojo); }
+.lv-zone-caret { flex: 0 0 auto; color: var(--texto-suave); transition: transform .18s; }
+.lv-zone-toggle.open .lv-zone-caret { transform: rotate(180deg); }
+
+.lv-zone-list { display: flex; flex-direction: column; gap: .45rem; margin-top: .5rem; }
+.lv-zone-opt {
+  display: flex; align-items: center; gap: .7rem; width: 100%; text-align: left;
+  background: var(--blanco); border: 1.5px solid rgba(41,35,31,.14); border-radius: var(--radio-sm);
+  padding: .65rem .8rem; font-family: var(--f-texto); color: var(--texto);
+  transition: border-color .15s, background .15s;
+}
+.lv-zone-opt:hover { border-color: var(--rojo); }
+.lv-zone-opt.on { border-color: var(--rojo); background: rgba(167,28,25,.05); box-shadow: inset 0 0 0 1px var(--rojo); }
+.lv-zone-radio { flex: 0 0 auto; width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(41,35,31,.3); position: relative; }
+.lv-zone-opt.on .lv-zone-radio { border-color: var(--rojo); }
+.lv-zone-opt.on .lv-zone-radio::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--rojo); }
+.lv-zone-campos { flex: 1; min-width: 0; font-size: .92rem; line-height: 1.25; font-weight: 600; }
+.lv-zone-precio { flex: 0 0 auto; font-family: var(--f-titular); font-weight: 800; color: var(--rojo); }
+
 /* ---------- Modal (personalizar pizza) ---------- */
 .lv-modal { position: fixed; inset: 0; z-index: 120; display: grid; place-items: end center; padding: 0; }
 .lv-modal-card {

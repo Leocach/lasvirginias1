@@ -14,6 +14,18 @@
   const MAX_ADIC = 2;                 // veces por adicional en una pizza
   const CART_KEY = 'lasvirginias_cart_v1';
 
+  /* ---------- Zonas de delivery (precio del envío) ----------
+     Viven en el menú (editables por el dueño en el panel → se guardan
+     en la base). Si el menú aún no las trae, se usan las del DEFAULT. */
+  function deliveryZones() {
+    const m = MENU.envio && Array.isArray(MENU.envio.zonas) && MENU.envio.zonas.length ? MENU.envio.zonas : null;
+    const d = (LV.DEFAULT && LV.DEFAULT.envio && LV.DEFAULT.envio.zonas) || [];
+    return (m || d).filter(z => z && z.id);
+  }
+  const zoneById = id => deliveryZones().find(z => z.id === id);
+  // Los campos pueden venir como texto ("A, B, C") o como arreglo
+  const zoneCampos = z => (z ? (Array.isArray(z.campos) ? z.campos.join(', ') : (z.campos || '')) : '');
+
   // Ícono ilustrado del adicional (fuente compartida en data.js). Si no hay
   // imagen asociada, cae al ícono SVG de línea.
   function adicIco(a) {
@@ -30,7 +42,8 @@
   let cart = [];
   let drinkQty = 0;
   let view = 'cart';                  // 'cart' | 'checkout'
-  const co = { nombre: '', tipo: 'delivery', direccion: '', nota: '' };
+  let zoneOpen = false;               // desplegable de zona abierto/cerrado
+  const co = { nombre: '', tipo: 'delivery', zona: '', direccion: '', nota: '' };
 
   (function loadCart() {
     try {
@@ -67,6 +80,13 @@
     if (drinkQty > 0 && MENU.bebida) t += (Number(MENU.bebida.precio) || 0) * drinkQty;
     return t;
   }
+  // Costo del envío: solo aplica en delivery y con una zona elegida
+  function deliveryFee() {
+    if (co.tipo !== 'delivery') return 0;
+    const z = zoneById(co.zona);
+    return z ? (Number(z.precio) || 0) : 0;
+  }
+  const grandTotal = () => cartTotal() + deliveryFee();
   const itemCount = () => cart.reduce((s, l) => s + l.qty, 0) + drinkQty;
 
   /* ---------- Feedback (toast existente) ---------- */
@@ -129,6 +149,31 @@
   }
   function anyOpen() { return !drawer.hidden || !modal.hidden; }
 
+  /* ---------- Botón "atrás" del móvil ----------
+     Al abrir el carrito agregamos una entrada al historial. Así, cuando el
+     cliente toca "atrás", solo se oculta el carrito (y el pedido se mantiene,
+     guardado en sessionStorage) en vez de salir de la página. */
+  let navGuard = false;
+  // Evita que el navegador "restaure" el scroll al usar history.back() (nos
+  // desplazaríamos solos al menú sin que el navegador nos regrese arriba).
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+  function armBack() {
+    if (navGuard) return;
+    navGuard = true;
+    try { history.pushState({ lvCart: 1 }, ''); } catch (e) {}
+  }
+  function disarmBack() {
+    if (!navGuard) return;
+    navGuard = false;
+    try { history.back(); } catch (e) {}
+  }
+  window.addEventListener('popstate', function () {
+    if (!navGuard) return;      // no era nuestra entrada de historial
+    navGuard = false;           // "atrás" ya la consumió
+    if (!modal.hidden) closeModal();
+    if (!drawer.hidden) closeDrawer();
+  });
+
   /* ============================================================
      FAB — estado según el pedido
      ============================================================ */
@@ -175,13 +220,14 @@
     scrim.hidden = false;
     lockScroll(true);
     requestAnimationFrame(() => { modal.classList.add('open'); scrim.classList.add('show'); });
+    armBack();
   }
   function closeModal() {
     modal.classList.remove('open');
     if (drawer.hidden) scrim.classList.remove('show');
     setTimeout(() => {
       modal.hidden = true;
-      if (!anyOpen()) { scrim.hidden = true; lockScroll(false); }
+      if (!anyOpen()) { scrim.hidden = true; lockScroll(false); disarmBack(); }
     }, 200);
   }
 
@@ -288,13 +334,14 @@
     scrim.hidden = false;
     lockScroll(true);
     requestAnimationFrame(() => { drawer.classList.add('open'); scrim.classList.add('show'); });
+    armBack();
   }
   function closeDrawer() {
     drawer.classList.remove('open');
     if (modal.hidden) scrim.classList.remove('show');
     setTimeout(() => {
       drawer.hidden = true;
-      if (!anyOpen()) { scrim.hidden = true; lockScroll(false); }
+      if (!anyOpen()) { scrim.hidden = true; lockScroll(false); disarmBack(); }
     }, 260);
   }
 
@@ -374,6 +421,7 @@
   function renderCheckout() {
     drawerTitle.textContent = 'Últimos datos';
     const isDelivery = co.tipo === 'delivery';
+    const zsel = zoneById(co.zona);
     drawerBody.innerHTML = `
       <div class="lv-co">
         <label class="lv-field">
@@ -390,6 +438,24 @@
         </div>
 
         ${isDelivery ? `
+        <div class="lv-field">
+          <span>¿A qué campo vamos? <small>· obligatorio</small></span>
+          <button type="button" class="lv-zone-toggle ${zsel ? 'sel' : ''} ${zoneOpen ? 'open' : ''}" data-zone-toggle>
+            <span class="lv-zone-cur">${zsel ? zoneCampos(zsel) : 'Elige tu zona de entrega'}</span>
+            ${zsel ? `<span class="lv-zone-cur-price">${precio(zsel.precio)}</span>` : ''}
+            <span class="lv-zone-caret" aria-hidden="true">▾</span>
+          </button>
+          ${zoneOpen ? `
+          <div class="lv-zone-list">
+            ${deliveryZones().map(z => `
+              <button type="button" class="lv-zone-opt ${co.zona === z.id ? 'on' : ''}" data-zone="${z.id}">
+                <span class="lv-zone-radio" aria-hidden="true"></span>
+                <span class="lv-zone-campos">${zoneCampos(z)}</span>
+                <span class="lv-zone-precio">${precio(z.precio)}</span>
+              </button>`).join('')}
+          </div>` : ''}
+        </div>
+
         <label class="lv-field">
           <span>Dirección <small>(opcional)</small></span>
           <input type="text" id="coDir" placeholder="Sector, calle, casa/referencia" value="${co.direccion.replace(/"/g, '&quot;')}" autocomplete="street-address">
@@ -400,9 +466,10 @@
           <input type="text" id="coNota" placeholder="Ej: sin cebolla, tocar el timbre…" value="${co.nota.replace(/"/g, '&quot;')}">
         </label>
 
-        <div class="lv-co-resumen">
-          <span>${itemCount()} ${itemCount() === 1 ? 'artículo' : 'artículos'}</span>
-          <b>${precio(cartTotal())}</b>
+        <div class="lv-co-tot">
+          <div class="lv-co-row"><span>Subtotal · ${itemCount()} ${itemCount() === 1 ? 'artículo' : 'artículos'}</span><span>${precio(cartTotal())}</span></div>
+          ${isDelivery ? `<div class="lv-co-row"><span>Delivery${zsel ? '' : ' <em>· elige zona</em>'}</span><span>${zsel ? precio(deliveryFee()) : '—'}</span></div>` : ''}
+          <div class="lv-co-row lv-co-grand"><b>Total</b><b>${precio(grandTotal())}</b></div>
         </div>
       </div>`;
 
@@ -430,14 +497,16 @@
     const t = e.target.closest('button'); if (!t) return;
     const num = attr => t.hasAttribute(attr) ? parseInt(t.getAttribute(attr), 10) : null;
 
-    if (t.hasAttribute('data-see-menu')) { closeDrawer(); scrollToMenu(); return; }
+    if (t.hasAttribute('data-see-menu')) { goToMenu(); return; }
     if (t.hasAttribute('data-line-inc')) { const i = num('data-line-inc'); cart[i].qty++; persist(); updateFab(); renderDrawer(); return; }
     if (t.hasAttribute('data-line-dec')) { const i = num('data-line-dec'); if (cart[i].qty > 1) { cart[i].qty--; } else { cart.splice(i, 1); } persist(); updateFab(); renderDrawer(); return; }
     if (t.hasAttribute('data-line-del')) { const i = num('data-line-del'); cart.splice(i, 1); persist(); updateFab(); renderDrawer(); return; }
     if (t.hasAttribute('data-line-edit')) { const i = num('data-line-edit'); openCustomizer(cart[i].pizzaId, i); return; }
     if (t.hasAttribute('data-drink-inc')) { drinkQty++; persist(); updateFab(); renderDrawer(); return; }
     if (t.hasAttribute('data-drink-dec')) { if (drinkQty > 0) drinkQty--; persist(); updateFab(); renderDrawer(); return; }
-    if (t.hasAttribute('data-tipo')) { syncCheckoutFromDOM(); co.tipo = t.getAttribute('data-tipo'); renderCheckout(); return; }
+    if (t.hasAttribute('data-tipo')) { syncCheckoutFromDOM(); co.tipo = t.getAttribute('data-tipo'); if (co.tipo !== 'delivery') zoneOpen = false; renderCheckout(); return; }
+    if (t.hasAttribute('data-zone-toggle')) { syncCheckoutFromDOM(); zoneOpen = !zoneOpen; renderCheckout(); return; }
+    if (t.hasAttribute('data-zone')) { syncCheckoutFromDOM(); co.zona = t.getAttribute('data-zone'); zoneOpen = false; renderCheckout(); return; }
   });
 
   drawerFoot.addEventListener('click', (e) => {
@@ -450,6 +519,12 @@
   function scrollToMenu() {
     const el = document.getElementById('menu');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  // Cierra el carrito y, cuando terminó de cerrarse (scroll del body ya
+  // liberado y el history.back() consumido), lleva al menú.
+  function goToMenu() {
+    closeDrawer();
+    setTimeout(scrollToMenu, 300);
   }
 
   /* ============================================================
@@ -476,21 +551,51 @@
       L.push('');
     }
     L.push('━━━━━━━━━━━━━');
-    L.push(`*TOTAL: ${precio(cartTotal())}*`);
+    const zsel = zoneById(co.zona);
+    if (co.tipo === 'delivery' && zsel) {
+      L.push(`Subtotal: ${precio(cartTotal())}`);
+      L.push(`Delivery: ${precio(deliveryFee())}`);
+    }
+    L.push(`*TOTAL: ${precio(grandTotal())}*`);
     L.push('');
     if (co.nombre.trim()) L.push(`👤 *Cliente:* ${co.nombre.trim()}`);
-    L.push(`${co.tipo === 'delivery' ? '🛵 *Entrega:* Delivery' : '🏠 *Entrega:* Take away (retiro)'}`);
-    if (co.tipo === 'delivery' && co.direccion.trim()) L.push(`📍 *Dirección:* ${co.direccion.trim()}`);
+    if (co.tipo === 'delivery') {
+      L.push('🛵 *Entrega:* Delivery');
+      if (zsel) L.push(`📍 *Zona:* ${zoneCampos(zsel)} — ${precio(zsel.precio)}`);
+      if (co.direccion.trim()) L.push(`📍 *Dirección:* ${co.direccion.trim()}`);
+    } else {
+      L.push('🏠 *Entrega:* Take away (retiro)');
+    }
     if (co.nota.trim()) L.push(`📝 *Nota:* ${co.nota.trim()}`);
     return L.join('\n');
   }
+  function clearOrder() {
+    cart = [];
+    drinkQty = 0;
+    co.zona = '';
+    co.direccion = '';
+    co.nota = '';
+    zoneOpen = false;
+    view = 'cart';
+    persist();
+    updateFab();
+  }
   function sendToWhatsApp() {
     if (itemCount() === 0) { toast('Tu pedido está vacío 🍕'); return; }
+    // La zona de entrega es obligatoria en delivery
+    if (co.tipo === 'delivery' && !zoneById(co.zona)) {
+      zoneOpen = true; renderCheckout();
+      toast('Elige a qué campo llevamos tu pedido 🛵');
+      return;
+    }
     const num = waNumber();
     const msg = encodeURIComponent(buildMessage());
     const url = num ? `https://wa.me/${num}?text=${msg}` : `https://wa.me/?text=${msg}`;
     window.open(url, '_blank', 'noopener');
     toast('Abriendo WhatsApp… ¡gracias! 🙌');
+    // Vaciar el pedido para que el cliente pueda armar otro enseguida
+    clearOrder();
+    closeDrawer();
   }
 
   /* ============================================================

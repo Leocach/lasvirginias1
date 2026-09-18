@@ -519,6 +519,10 @@ html { accent-color: var(--rojo); }
   transition: border-color .15s, box-shadow .15s;
 }
 .lv-field input:focus { outline: none; border-color: var(--rojo); box-shadow: 0 0 0 3px rgba(167,28,25,.12); }
+/* Estado de campo obligatorio sin completar */
+.lv-field.err input,
+.lv-field.err .lv-zone-toggle { border-color: var(--rojo); box-shadow: 0 0 0 3px rgba(167,28,25,.12); }
+.lv-field-err { color: var(--rojo); font-weight: 700; font-size: .82rem; font-style: normal; margin-top: .1rem; }
 .lv-co-resumen { display: flex; align-items: baseline; justify-content: space-between; padding-top: .6rem; border-top: 1px dashed rgba(41,35,31,.2); }
 .lv-co-resumen span { color: var(--texto-suave); font-weight: 600; }
 .lv-co-resumen b { font-family: var(--f-titular); font-weight: 900; font-size: 1.35rem; color: var(--rojo); }

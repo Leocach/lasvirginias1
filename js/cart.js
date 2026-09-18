@@ -44,6 +44,8 @@
   let view = 'cart';                  // 'cart' | 'checkout'
   let zoneOpen = false;               // desplegable de zona abierto/cerrado
   const co = { nombre: '', tipo: 'delivery', zona: '', direccion: '', nota: '' };
+  // Campos obligatorios que faltaron al intentar enviar (para marcarlos en rojo)
+  const coErr = { nombre: false, zona: false };
 
   (function loadCart() {
     try {
@@ -424,9 +426,10 @@
     const zsel = zoneById(co.zona);
     drawerBody.innerHTML = `
       <div class="lv-co">
-        <label class="lv-field">
-          <span>Tu nombre</span>
+        <label class="lv-field ${coErr.nombre ? 'err' : ''}">
+          <span>Tu nombre <small>· obligatorio</small></span>
           <input type="text" id="coNombre" placeholder="¿Cómo te llamas?" value="${co.nombre.replace(/"/g, '&quot;')}" autocomplete="name">
+          ${coErr.nombre ? '<em class="lv-field-err">Escribe tu nombre para hacer el pedido</em>' : ''}
         </label>
 
         <div class="lv-field">
@@ -438,11 +441,10 @@
         </div>
 
         ${isDelivery ? `
-        <div class="lv-field">
+        <div class="lv-field ${coErr.zona ? 'err' : ''}">
           <span>¿A qué campo vamos? <small>· obligatorio</small></span>
           <button type="button" class="lv-zone-toggle ${zsel ? 'sel' : ''} ${zoneOpen ? 'open' : ''}" data-zone-toggle>
             <span class="lv-zone-cur">${zsel ? zoneCampos(zsel) : 'Elige tu zona de entrega'}</span>
-            ${zsel ? `<span class="lv-zone-cur-price">${precio(zsel.precio)}</span>` : ''}
             <span class="lv-zone-caret" aria-hidden="true">▾</span>
           </button>
           ${zoneOpen ? `
@@ -451,9 +453,9 @@
               <button type="button" class="lv-zone-opt ${co.zona === z.id ? 'on' : ''}" data-zone="${z.id}">
                 <span class="lv-zone-radio" aria-hidden="true"></span>
                 <span class="lv-zone-campos">${zoneCampos(z)}</span>
-                <span class="lv-zone-precio">${precio(z.precio)}</span>
               </button>`).join('')}
           </div>` : ''}
+          ${coErr.zona ? '<em class="lv-field-err">Elige a qué campo llevamos tu pedido</em>' : ''}
         </div>
 
         <label class="lv-field">
@@ -482,7 +484,17 @@
 
     // Guardar lo que se escribe (sin re-render en cada tecla)
     const bind = (id, key) => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { co[key] = el.value; }); };
-    bind('coNombre', 'nombre'); bind('coDir', 'direccion'); bind('coNota', 'nota');
+    bind('coDir', 'direccion'); bind('coNota', 'nota');
+    // Nombre: además de guardar, quita la marca de error apenas escriba algo
+    const elN = document.getElementById('coNombre');
+    if (elN) elN.addEventListener('input', () => {
+      co.nombre = elN.value;
+      if (coErr.nombre && co.nombre.trim()) {
+        coErr.nombre = false;
+        const f = elN.closest('.lv-field'); if (f) f.classList.remove('err');
+        const m = f && f.querySelector('.lv-field-err'); if (m) m.remove();
+      }
+    });
   }
 
   function syncCheckoutFromDOM() {
@@ -506,7 +518,7 @@
     if (t.hasAttribute('data-drink-dec')) { if (drinkQty > 0) drinkQty--; persist(); updateFab(); renderDrawer(); return; }
     if (t.hasAttribute('data-tipo')) { syncCheckoutFromDOM(); co.tipo = t.getAttribute('data-tipo'); if (co.tipo !== 'delivery') zoneOpen = false; renderCheckout(); return; }
     if (t.hasAttribute('data-zone-toggle')) { syncCheckoutFromDOM(); zoneOpen = !zoneOpen; renderCheckout(); return; }
-    if (t.hasAttribute('data-zone')) { syncCheckoutFromDOM(); co.zona = t.getAttribute('data-zone'); zoneOpen = false; renderCheckout(); return; }
+    if (t.hasAttribute('data-zone')) { syncCheckoutFromDOM(); co.zona = t.getAttribute('data-zone'); coErr.zona = false; zoneOpen = false; renderCheckout(); return; }
   });
 
   drawerFoot.addEventListener('click', (e) => {
@@ -561,7 +573,7 @@
     if (co.nombre.trim()) L.push(`👤 *Cliente:* ${co.nombre.trim()}`);
     if (co.tipo === 'delivery') {
       L.push('🛵 *Entrega:* Delivery');
-      if (zsel) L.push(`📍 *Zona:* ${zoneCampos(zsel)} — ${precio(zsel.precio)}`);
+      if (zsel) L.push(`📍 *Zona:* ${zoneCampos(zsel)}`);
       if (co.direccion.trim()) L.push(`📍 *Dirección:* ${co.direccion.trim()}`);
     } else {
       L.push('🏠 *Entrega:* Take away (retiro)');
@@ -576,16 +588,26 @@
     co.direccion = '';
     co.nota = '';
     zoneOpen = false;
+    coErr.nombre = false;
+    coErr.zona = false;
     view = 'cart';
     persist();
     updateFab();
   }
   function sendToWhatsApp() {
     if (itemCount() === 0) { toast('Tu pedido está vacío 🍕'); return; }
-    // La zona de entrega es obligatoria en delivery
-    if (co.tipo === 'delivery' && !zoneById(co.zona)) {
-      zoneOpen = true; renderCheckout();
-      toast('Elige a qué campo llevamos tu pedido 🛵');
+    // Campos obligatorios: nombre (siempre) y zona (solo en delivery)
+    coErr.nombre = !co.nombre.trim();
+    coErr.zona = (co.tipo === 'delivery' && !zoneById(co.zona));
+    if (coErr.nombre || coErr.zona) {
+      if (coErr.zona) zoneOpen = true;
+      renderCheckout();
+      if (coErr.nombre) {
+        const el = document.getElementById('coNombre'); if (el) el.focus();
+        toast('Escribe tu nombre para hacer el pedido ✍️');
+      } else {
+        toast('Elige a qué campo llevamos tu pedido 🛵');
+      }
       return;
     }
     const num = waNumber();
